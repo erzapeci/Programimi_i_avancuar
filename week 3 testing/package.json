@@ -1,0 +1,11 @@
+{
+  "name": "testim-projekti",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "mocha": "^11.1.0"
+  }
+}
