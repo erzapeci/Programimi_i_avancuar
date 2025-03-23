@@ -3,6 +3,7 @@ import pandas as pd  # For data manipulation and analysis
 import numpy as np  # For numerical and array-based operations
 from scipy import stats  # For statistical functions such as z-score and mode
 
+# Function to load data from a CSV file
 def load_data(file_path):
     """
     Reads data from a CSV file and returns it as a pandas DataFrame.
@@ -11,7 +12,7 @@ def load_data(file_path):
     :return: A pandas DataFrame containing the data from the CSV file.
     """
     try:
-        # Use pandas to read the CSV file.
+        # Try reading the CSV file into a DataFrame
         df = pd.read_csv(file_path)
         return df
     except Exception as e:
@@ -19,6 +20,7 @@ def load_data(file_path):
         print(f"Error reading file: {e}")
         sys.exit(1)
 
+# Function to calculate basic statistics for a given column
 def calculate_stats(df, column):
     """
     Calculates and prints basic statistics (mean, median, mode, standard deviation)
@@ -36,19 +38,20 @@ def calculate_stats(df, column):
     data = df[column]
     print(f"Statistics for {column}:")
 
-    # Calculate the mean using NumPy.
+    # Calculate and display the mean using NumPy.
     print(f"Mean: {np.mean(data):.2f}")
 
-    # Calculate the median using NumPy.
+    # Calculate and display the median using NumPy.
     print(f"Median: {np.median(data):.2f}")
 
-    # Calculate the mode using SciPy. 
+    # Calculate and display the mode using SciPy.
     # 'stats.mode' returns an array, so we take the first element [0][0].
     print(f"Mode: {stats.mode(data, keepdims=True)[0][0]}")
 
-    # Calculate the standard deviation using NumPy. ddof=1 for sample standard deviation.
+    # Calculate and display the standard deviation using NumPy. ddof=1 for sample standard deviation.
     print(f"Standard Deviation: {np.std(data, ddof=1):.2f}")
 
+# Function to generate a text-based histogram
 def generate_text_histogram(df, column, bins=10):
     """
     Generates and prints a text-based histogram for a specified column.
@@ -75,6 +78,7 @@ def generate_text_histogram(df, column, bins=10):
         # hist[i] is the number of data points in that bin.
         print(f"{bin_edges[i]:.2f} - {bin_edges[i+1]:.2f}: {'#' * hist[i]}")
 
+# Function to calculate Pearson correlation between two columns
 def find_correlation(df, col1, col2):
     """
     Finds and prints the Pearson correlation coefficient between two columns in the DataFrame.
@@ -88,10 +92,11 @@ def find_correlation(df, col1, col2):
         print("One of the columns was not found in the data.")
         return
 
-    # Use the built-in DataFrame method .corr() to compute correlation.
+    # Compute and print the correlation coefficient.
     correlation = df[col1].corr(df[col2])
     print(f"Correlation between {col1} and {col2}: {correlation:.2f}")
 
+# Function to detect outliers in a column based on Z-scores
 def detect_outliers(df, column, threshold=2.0):
     """
     Identifies outliers using the Z-score method and prints rows containing outliers.
@@ -105,92 +110,47 @@ def detect_outliers(df, column, threshold=2.0):
         print(f"Column '{column}' not found in the data.")
         return
 
-    # Extract the data from the specified column.
-    data = df[column]
+    # Compute Z-scores for each value in the column.
+    z_scores = np.abs(stats.zscore(df[column]))
 
-    # Compute the Z-score for each value in the column.
-    # zscore() returns an array of z-scores for each element.
-    z_scores = np.abs(stats.zscore(data))
-
-    # Filter the DataFrame to rows where the z-score is greater than the threshold.
+    # Identify rows where the Z-score exceeds the threshold.
     outliers = df[z_scores > threshold]
     print(f"Outliers for {column} (Threshold={threshold}):")
     print(outliers)
 
+# Main function to handle command-line arguments and run the appropriate analysis
 def main():
     """
     Main function to handle command-line arguments and execute the appropriate analysis.
-    
-    Usage:
-      python data_analysis.py <file> <command> <column> [options]
-
-    Commands:
-      stats <column>
-      histogram <column> <bins>
-      correlation <column1> <column2>
-      outliers <column_name> <threshold>
     """
-    # Check if there are enough command-line arguments.
     if len(sys.argv) < 4:
         print("Usage: python data_analysis.py <file> <command> <column> [options]")
         return
-    
-    # Extract the arguments.
+
+    # Parse command-line arguments.
     file_path = sys.argv[1]
     command = sys.argv[2]
     column = sys.argv[3]
 
-    # Load the CSV data into a DataFrame.
+    # Load the CSV data.
     df = load_data(file_path)
-    
+
+    # Execute the command based on user input.
     if command == "stats":
-        # Calculate and print basic statistics.
         calculate_stats(df, column)
     elif command == "histogram":
-        # Generate a text-based histogram. 
-        # If user specified a bin size, parse it; otherwise default to 10.
         bins = int(sys.argv[4]) if len(sys.argv) > 4 else 10
         generate_text_histogram(df, column, bins)
     elif command == "correlation":
-        # For correlation, we need two columns: the one provided in sys.argv[3] 
-        # and an additional one in sys.argv[4].
         if len(sys.argv) < 5:
             print("Usage: python data_analysis.py <file> correlation <column1> <column2>")
             return
         find_correlation(df, column, sys.argv[4])
     elif command == "outliers":
-        # Detect outliers based on a threshold if provided; default = 2.0.
         threshold = float(sys.argv[4]) if len(sys.argv) > 4 else 2.0
         detect_outliers(df, column, threshold)
     else:
-        # If the command is not recognized, print a message.
         print("Unknown command.")
 
-# Entry point for the script when called from the command line.
 if __name__ == "__main__":
     main()
-
-# Below this point is a simple demonstration if the script is run directly (not from the command line).
-if __name__ == "__main__":
-    # Create a test DataFrame in memory for demonstration purposes.
-    data = {
-        "column1": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        "column2": [5, 15, 25, 35, 45, 55, 65, 75, 85, 95]
-    }
-    df = pd.DataFrame(data)
-
-    # Demonstrate the 'calculate_stats' function on "column1".
-    calculate_stats(df, "column1")
-    print("\n")
-    
-    # Demonstrate the 'generate_text_histogram' function on "column1".
-    generate_text_histogram(df, "column1", bins=5)
-    print("\n")
-    
-    # Demonstrate the 'find_correlation' function between "column1" and "column2".
-    find_correlation(df, "column1", "column2")
-    print("\n")
-    
-    # Demonstrate the 'detect_outliers' function on "column1" with threshold=1.5.
-    detect_outliers(df, "column1", threshold=1.5)
-    print("\n")
