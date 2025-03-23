@@ -1,7 +1,12 @@
 const validateUserData = require('./validateUserData');
 
+// Grouping the unit tests for the validateUserData function
+// Each 'describe' block focuses on a specific validation aspect
+
 describe('validateUserData - Unit Tests', () => {
-  // Test case for valid input
+  /**
+   * Test for valid input data
+   */
   describe('Valid Input', () => {
     test('should return valid when all required and optional fields are correctly filled', () => {
       const validData = {
@@ -17,7 +22,9 @@ describe('validateUserData - Unit Tests', () => {
     });
   });
 
-  // Test case for invalid input with null or non-object data
+  /**
+   * General test cases for invalid data (null or wrong type)
+   */
   describe('Invalid Input - General Cases', () => {
     test('should fail when userData is null', () => {
       const result = validateUserData(null);
@@ -32,7 +39,9 @@ describe('validateUserData - Unit Tests', () => {
     });
   });
 
-  // Test case for username validation
+  /**
+   * Username validation tests
+   */
   describe('Username Validation', () => {
     test.each([
       [{ email: 'test@example.com', password: 'Password1!' }, 'Username is required'],
@@ -46,7 +55,9 @@ describe('validateUserData - Unit Tests', () => {
     });
   });
 
-  // Test case for email validation
+  /**
+   * Email validation tests
+   */
   describe('Email Validation', () => {
     test('should fail when email is missing', () => {
       const invalidData = { username: 'ValidUser123', password: 'Password1!' };
@@ -63,7 +74,9 @@ describe('validateUserData - Unit Tests', () => {
     });
   });
 
-  // Test case for password validation
+  /**
+   * Password validation tests
+   */
   describe('Password Validation', () => {
     test.each([
       [{ username: 'ValidUser123', email: 'test@example.com' }, 'Password is required'],
@@ -77,7 +90,9 @@ describe('validateUserData - Unit Tests', () => {
     });
   });
 
-  // Test case for age validation (optional)
+  /**
+   * Age validation tests (optional)
+   */
   describe('Age Validation (Optional)', () => {
     test.each([
       [{ username: 'ValidUser123', email: 'test@example.com', password: 'Password1!', age: 'eighteen' }, 'Age must be a number'],
@@ -89,7 +104,9 @@ describe('validateUserData - Unit Tests', () => {
     });
   });
 
-  // Test case for referral code validation (optional)
+  /**
+   * Referral code validation tests (optional)
+   */
   describe('Referral Code Validation (Optional)', () => {
     test.each([
       [{ username: 'ValidUser123', email: 'test@example.com', password: 'Password1!', referralCode: 12345678 }, 'Referral code must be a string'],
